@@ -231,6 +231,37 @@
         </svg>    
     </div>
 
+    <div class="night-background" id="night-background">
+        <div class="moon"></div>
+        
+        <div class="star star1"></div>
+        <div class="star star2"></div>
+        <div class="star star3"></div>
+        <div class="star star4"></div>
+        <div class="star star5"></div>
+        
+        <div class="cloud cloud1" style="opacity: 0.3;"></div>
+        <div class="cloud cloud2" style="opacity: 0.4;"></div>
+        
+        <div class="trees">
+            <div class="tree tree1">
+                <div class="tree-leaves" style="border-bottom-color: #1a4a1a;"></div>
+                <div class="tree-trunk"></div>
+            </div>
+            <div class="tree tree2">
+                <div class="tree-leaves" style="border-bottom-color: #1a4a1a;"></div>
+                <div class="tree-trunk"></div>
+            </div>
+            <div class="tree tree3">
+                <div class="tree-leaves" style="border-bottom-color: #1a4a1a;"></div>
+                <div class="tree-trunk"></div>
+            </div>
+            <div class="tree tree4">
+                <div class="tree-leaves" style="border-bottom-color: #1a4a1a;"></div>
+                <div class="tree-trunk"></div>
+            </div>
+        </div>
+    </div>
     <div class="screen-drops" id="screen-drops"></div>
 
     <!-- Main Weather App -->
@@ -295,7 +326,130 @@
             <small style="font-style: italic; color: rgba(255,255,255,0.7);">Source: Open Meteo API</small>
         </div>
     </form>
-    
+
+
+    <!-- Hourly Modal -->
+    <div id="hourly-modal" class="modal-overlay">
+        <div class="hourly-modal-content">
+            <div class="modal-header">
+                <span id="close-hourly-modal" class="close">&times;</span>
+                <div class="modal-weather-icon">
+                    <span id="hourly-modal-emoji"></span>
+                </div>
+                <h3 id="hourly-modal-time"></h3>
+                <p id="hourly-modal-description"></p>
+            </div>
+            
+            <div class="modal-body">
+                <div class="modal-temp-section">
+                    <div class="temp-main">
+                        <span id="hourly-modal-temp"></span>°C
+                    </div>
+                    <div class="temp-details">
+                        <div class="temp-item">
+                            <span class="temp-label">Feels like</span>
+                            <span class="temp-value"><span id="hourly-modal-apparent-temp"></span>°C</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-details">
+                    <div class="detail-row">
+                        <div class="detail-item">
+                            <span class="detail-label">💧 Humidity</span>
+                            <span class="detail-value"><span id="hourly-modal-humidity"></span>%</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">🌧️ Precipitation</span>
+                            <span class="detail-value"><span id="hourly-modal-precipitation"></span>mm</span>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <div class="detail-item">
+                            <span class="detail-label">☔ Rain Probability</span>
+                            <span class="detail-value"><span id="hourly-modal-rain-prob"></span>%</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">🧭 Wind Direction</span>
+                            <span class="detail-value" id="hourly-modal-wind-direction"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <div class="detail-item full-width">
+                            <span class="detail-label">🌤️ Weather</span>
+                            <span class="detail-value" id="hourly-modal-weather-code"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Modal -->
+    <div class="modal-overlay" id="daily-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="close-daily-modal" class="close">&times;</span>
+                <div class="modal-weather-icon">
+                    <span id="modal-emoji">☀️</span>
+                </div>
+                <h3 id="modal-day-name"></h3>
+                <p id="modal-date"</p>
+            </div>
+
+            <div class="modal-body">
+                <div class="modal-temp-section">
+                    <div class="temp-main">
+                        <span id="modal-temp-high"></span>°C
+                    </div>
+                    <div class="temp-details">
+                        <div class="temp-item">
+                            <span class="temp-label">low</span>
+                            <span class="temp-value"><span id="modal-temp-low"></span>°C</span>
+                        </div>
+                        <div class="temp-item">
+                            <span class="temp-label">Weather</span>
+                            <span class="temp-value" id="modal-description"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-details">
+                    <div class="detail-row">
+                        <div class="detail-item">
+                            <span class="detail-label">🌧️ Precipitation</span>
+                            <span class="detail-value"><span id="modal-precipitation-sum">2.5</span> mm</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">☔ Rain Probability</span>
+                            <span class="detail-value"><span id="modal-precipitation-prob">45</span>%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <div class="detail-item">
+                            <span class="detail-label">☔ Rain</span>
+                            <span class="detail-value"><span id="modal-precipitation-hours"></span> hrs.</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">🌪️ Wind speed</span>
+                            <span class="detail-value">15 km/h</span>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <div class="detail-item full-width">
+                            <span class="detail-label">🌤️ Weather</span>
+                            <span class="detail-value" id="modal-weather-code"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="/static/js/main-script.js"></script>
 </body>
 </html>

@@ -291,10 +291,10 @@ window.addEventListener('click', function(e) {
 
 
 
-
-
-
-
+function isNight(currentDate) {
+    const hour = currentDate.getHours();
+    return hour < 6 || hour > 20;
+}
 
 
 
@@ -442,8 +442,8 @@ const weatherCodes = {
     85: { desc: "Slight Snow Showers", bg: "snow-background", emoji: "🌨️" },
     86: { desc: "Heavy Snow Showers", bg: "snow-background", emoji: "❄️" },
     95: { desc: "Thunderstorm", bg: "thunderstorm-background", emoji: "⛈️" },
-    96: { desc: "Thunderstorm with slight hail", bg: "thunderstorm-background", emoji: "⛈️" },
-    99: { desc: "Thunderstorm with heavy hail", bg: "thunderstorm-background", emoji: "⛈️" }
+    96: { desc: "Thunderstorm with slight hail", bg: "hail-background", emoji: "⛈️" },
+    99: { desc: "Thunderstorm with heavy hail", bg: "hail-background", emoji: "⛈️" }
 };
 
 function getWindDirection(degree) {
@@ -452,6 +452,8 @@ function getWindDirection(degree) {
     const index = Math.round((degree % 360) / 22.5) % 16;
     return directions[index];
 }
+
+let globalDailyForecast = [];
 
 async function getCountryFlag(country_code) {
     const country_code_formatted = country_code.toLowerCase()
@@ -494,7 +496,7 @@ async function fetchExtendedWeatherData(city) {
             'weather_code',
             'wind_direction_80m',
             'apparent_temperature',
-            'precipitation_probability'
+            'precipitation_probability',
             ].join(','),
             timezone: 'auto',
             forecast_days: 7
@@ -639,10 +641,13 @@ function generateDailyForecast(forecast, currentTime) {
             const weatherInfo = weatherCodes[forecast.daily.weather_code[i]] || weatherCodes[0];
             
             const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const dayNamesFull = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
             const weekday = dayNames[dayTime.getDay()];
+            const weekdayFull = dayNamesFull[dayTime.getDay()]
             
             dailyForecast.push({
                 weekday: weekday,
+                weekdayFull: weekdayFull,
                 date: dayTime.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
                 precipitation_sum: Math.round((forecast.daily.precipitation_sum[i] || 0) * 10) / 10,
                 apparent_temperature_max: Math.round(forecast.daily.apparent_temperature_max[i] || 0),
@@ -679,8 +684,35 @@ function displayHourlyForecast(hourlyData) {
             <div class="hour-temp">${hour.temperature}°</div>
             <div class="hour-rain">${hour.rain}%</div>
         `;
+        
+        hourElement.addEventListener('click', () => {
+            openHourlyModal(hour);
+        });
+        
         container.appendChild(hourElement);
     });
+}
+
+function openHourlyModal(hourData) {
+    const modal = document.getElementById('hourly-modal');
+
+    document.getElementById('hourly-modal-emoji').textContent = hourData.emoji;
+    document.getElementById('hourly-modal-time').textContent = hourData.time;
+    document.getElementById('hourly-modal-description').textContent = hourData.description;
+    document.getElementById('hourly-modal-temp').textContent = hourData.temperature;
+    document.getElementById('hourly-modal-apparent-temp').textContent = hourData.apparent_temperature;
+    document.getElementById('hourly-modal-humidity').textContent = hourData.humidity;
+    document.getElementById('hourly-modal-precipitation').textContent = hourData.precipitation;
+    document.getElementById('hourly-modal-rain-prob').textContent = hourData.rain;
+    document.getElementById('hourly-modal-wind-direction').textContent = hourData.wind_direction;
+    document.getElementById('hourly-modal-weather-code').textContent = hourData.weather_code;
+
+    modal.classList.add('show');
+}
+
+function closeHourlyModal() {
+    const modal = document.getElementById('hourly-modal');
+    modal.classList.remove('show');
 }
 
 function displayDailyForecast(dailyData) {
@@ -694,6 +726,8 @@ function displayDailyForecast(dailyData) {
         return;
     }
     
+    globalDailyForecast = dailyData;
+
     dailyData.forEach(day => {
         const dayElement = document.createElement('div');
         dayElement.className = 'daily-item';
@@ -715,12 +749,38 @@ function displayDailyForecast(dailyData) {
                 <div class="rain-amount">${day.precipitation_sum}mm</div>
             </div>
         `;
+
+        dayElement.addEventListener('click', () => {
+            openDailyModal(day);
+        });
+
         container.appendChild(dayElement);
     });
 }
 
+function openDailyModal(dayData) {
+    const modal = document.getElementById('daily-modal');
+
+    document.getElementById('modal-emoji').textContent = dayData.emoji;
+    document.getElementById('modal-day-name').textContent = dayData.weekdayFull;
+    document.getElementById('modal-date').textContent = dayData.dateFull;
+    document.getElementById('modal-description').textContent = dayData.description;
+    document.getElementById('modal-temp-high').textContent = dayData.apparent_temperature_max;
+    document.getElementById('modal-temp-low').textContent = dayData.apparent_temperature_min;
+    document.getElementById('modal-precipitation-sum').textContent = dayData.precipitation_sum;
+    document.getElementById('modal-precipitation-prob').textContent = dayData.precipitation_probability;
+    document.getElementById('modal-precipitation-hours').textContent = dayData.precipitation_hours;
+    document.getElementById('modal-weather-code').textContent = dayData.weather_code;    
+
+    modal.classList.add('show');
+}
+
+function closeDailyModal() {
+    const modal = document.getElementById('daily-modal');
+    modal.classList.remove('show');
+}
+
 function displayExtendedWeather(data) {
-    console.log(data)
     const elements = {
         'app-heading': data.location,
         'weather-desc': data.current_weather.weather,
@@ -758,8 +818,17 @@ function displayExtendedWeather(data) {
     if (weatherDisplay) {
         weatherDisplay.classList.add('show');
     }
-    
+
     activateScene(data.current_weather.bg);
+
+    const now = new Date();
+
+    const nightBg = document.getElementById("night-background");
+    if (isNight(now)) {
+        if (nightBg) nightBg.classList.add("active");
+    } else {
+        if (nightBg) nightBg.classList.remove("active");
+    }
 }
 
 document.getElementById('weather-app').addEventListener('submit', async function(e) {
@@ -803,5 +872,43 @@ document.getElementById('weather-app').addEventListener('submit', async function
 window.addEventListener("DOMContentLoaded", function() {
     loadPinsFromStorage();
     eventListeners();
+
+    const closeButton = document.getElementById('close-daily-modal');
+    const modal = document.getElementById('daily-modal');
+
+    const closeHourlyButton = document.getElementById('close-hourly-modal');
+    const hourlyModal = this.document.getElementById('hourly-modal');
+
     console.log('Pin system loaded');
+
+    if (closeButton) {
+        closeButton.addEventListener('click', closeDailyModal);
+    }
+
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDailyModal();
+            }
+        });
+    }
+    
+    if (closeHourlyButton) {
+        closeHourlyButton.addEventListener('click', closeHourlyModal);
+    }
+
+    if (hourlyModal) {
+        hourlyModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeHourlyModal();
+            }
+        });
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeDailyModal();
+            closeHourlyModal();
+        }
+    })
 });
