@@ -308,7 +308,7 @@ function updateEditButtonVisibility() {
         }
     } else {
         editButton.style.display = 'none';
-        pinList.classList.remove('show')
+        pinList.classList.remove('show');
         editMode = false;
     }
 }
