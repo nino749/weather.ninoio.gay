@@ -1882,7 +1882,13 @@ hr {
     transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
     animation: fadeInUp 0.9s cubic-bezier(0.23, 1, 0.32, 1);
     z-index: 10;
-    overflow: visible;
+    overflow: scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.modal-content::-webkit-scrollbar,
+.hourly-modal-content::-webkit-scrollbar {
+    display: none; 
 }
 
 .modal-overlay.show .modal-content,
