@@ -12,7 +12,41 @@ let editMode = false;
 document.addEventListener('DOMContentLoaded', function() {
     loadPinsFromStorage();
     eventListeners();
+    checkURLParameters(); // Neue Funktion für URL-Parameter
 });
+
+// Neue Funktion: URL-Parameter prüfen und automatische Suche
+function checkURLParameters() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchCityParam = urlParams.get('search');
+    
+    if (searchCityParam) {
+        const cityInput = document.getElementById('city-input');
+        if (cityInput) {
+            cityInput.value = searchCityParam;
+            // Kurze Verzögerung, damit alle Elemente geladen sind
+            setTimeout(() => {
+                searchCity(); // Ruft die searchCity Funktion auf
+            }, 100);
+        }
+    }
+}
+
+// Neue Funktion: URL aktualisieren wenn eine Stadt gesucht wird
+function updateURL(cityName) {
+    if (cityName && cityName.trim()) {
+        const newURL = new URL(window.location);
+        newURL.searchParams.set('search', cityName.trim());
+        window.history.replaceState({}, '', newURL);
+    }
+}
+
+// Neue Funktion: URL-Parameter entfernen
+function clearURLParameter() {
+    const newURL = new URL(window.location);
+    newURL.searchParams.delete('search');
+    window.history.replaceState({}, '', newURL);
+}
 
 async function searchCity() {
     const cityName = cityInput.value.trim();
@@ -29,6 +63,9 @@ async function searchCity() {
         displayExtendedWeather(weatherData);
         
         createPinButton(weatherData.location);
+        
+        // URL aktualisieren mit der gesuchten Stadt
+        updateURL(cityName);
 
         clearError();
         
@@ -106,6 +143,8 @@ function addPin(cityName) {
     const cityInput = document.getElementById('city-input');
     if (cityInput) {
         cityInput.value = '';
+        // URL-Parameter entfernen da das Eingabefeld geleert wurde
+        clearURLParameter();
     }
 }
 
