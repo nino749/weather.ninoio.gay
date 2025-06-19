@@ -1287,7 +1287,6 @@ hr {
     .daily-forecast {
         padding: 12px 8px;
         margin-top: 12px;
-        flex-wrap: wrap;
         gap: 8px;
     }
     .forecast-day {
@@ -1570,6 +1569,7 @@ hr {
     bottom: 0;
     background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
     pointer-events: none;
+    background-attachment: fixed;
 }
 
 .daily-forecast {
