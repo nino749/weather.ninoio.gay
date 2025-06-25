@@ -1,3 +1,80 @@
+// Helping to manage the weather app functionality, including fetching weather data, managing pinned cities, and handling UI interactions.
+async function getCountryFlag(country_code) {
+    const country_code_formatted = country_code.toLowerCase()
+    const flagUrl = `https://flagcdn.com/w40/${country_code_formatted}.png`;
+    const response2 = await fetch(flagUrl);
+    if (response2.ok) {
+        return flagUrl;
+    }
+}
+
+async function fetchCityFlag(city) {
+    try {
+        const geocodeResponse = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en`);
+        const geocodeData = await geocodeResponse.json();
+
+        if (!geocodeData.results || geocodeData.results.length === 0) {
+            throw new Error(`City '${city}' not found`);
+        }
+
+        const { country_code } = geocodeData.results[0];
+        return getCountryFlag(country_code);
+    }
+    catch (error) {
+        console.error(`Failed to fetch flag for city '${city}': ${error.message}`);
+        return null;
+    }
+}
+
+async function fetchExtendedWeatherData(city) {
+    try {
+        const geocodeResponse = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en`);
+        const geocodeData = await geocodeResponse.json();
+
+        if (!geocodeData.results || geocodeData.results.length === 0) {
+            throw new Error(`City '${city}' not found`);
+        }
+
+        const { latitude, longitude, name, country_code, country } = geocodeData.results[0];
+
+        const flag = await getCountryFlag(country_code)
+
+        const params = new URLSearchParams({
+            latitude: latitude,
+            longitude: longitude,
+            current_weather: 'true',
+            daily: [
+            'precipitation_sum',
+            'apparent_temperature_max', 
+            'apparent_temperature_min',
+            'precipitation_probability_max',
+            'weather_code',
+            'precipitation_hours'
+            ].join(','),
+            hourly: [
+            'temperature_2m',
+            'relative_humidity_2m', 
+            'precipitation',
+            'weather_code',
+            'wind_direction_80m',
+            'apparent_temperature',
+            'precipitation_probability',
+            ].join(','),
+            timezone: 'auto',
+            forecast_days: 7
+        });
+
+        const weatherResponse = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
+        const forecast = await weatherResponse.json();
+
+        return processWeatherData(forecast, name, flag, country);
+    } catch (error) {
+        throw new Error(`Failed to fetch weather data: ${error.message}`);
+    }
+}
+
+//
+
 function clearAllPins() {
     pinnedCities = [];
     savePinsToStorage();
@@ -12,10 +89,9 @@ let editMode = false;
 document.addEventListener('DOMContentLoaded', function() {
     loadPinsFromStorage();
     eventListeners();
-    checkURLParameters(); // Neue Funktion für URL-Parameter
+    checkURLParameters();
 });
 
-// Neue Funktion: URL-Parameter prüfen und automatische Suche
 function checkURLParameters() {
     const urlParams = new URLSearchParams(window.location.search);
     const searchCityParam = urlParams.get('search');
@@ -24,15 +100,13 @@ function checkURLParameters() {
         const cityInput = document.getElementById('city-input');
         if (cityInput) {
             cityInput.value = searchCityParam;
-            // Kurze Verzögerung, damit alle Elemente geladen sind
             setTimeout(() => {
-                searchCity(); // Ruft die searchCity Funktion auf
+                searchCity();
             }, 100);
         }
     }
 }
 
-// Neue Funktion: URL aktualisieren wenn eine Stadt gesucht wird
 function updateURL(cityName) {
     if (cityName && cityName.trim()) {
         const newURL = new URL(window.location);
@@ -41,7 +115,6 @@ function updateURL(cityName) {
     }
 }
 
-// Neue Funktion: URL-Parameter entfernen
 function clearURLParameter() {
     const newURL = new URL(window.location);
     newURL.searchParams.delete('search');
@@ -64,7 +137,6 @@ async function searchCity() {
         
         createPinButton(weatherData.location);
         
-        // URL aktualisieren mit der gesuchten Stadt
         updateURL(cityName);
 
         clearError();
@@ -143,7 +215,6 @@ function addPin(cityName) {
     const cityInput = document.getElementById('city-input');
     if (cityInput) {
         cityInput.value = '';
-        // URL-Parameter entfernen da das Eingabefeld geleert wurde
         clearURLParameter();
     }
 }
@@ -159,22 +230,23 @@ function updatePinDisplay() {
     pinnedCities.forEach((city, index) => {
         const pinElement = document.createElement('div');
         pinElement.className = 'pin-item';
-
-        if (editMode) {
-            pinElement.innerHTML = `
-                <span class="pin-name isediting" onclick="removePin(${index})">${city}</span>
-            `;
-        } else {
-            pinElement.innerHTML = `
-                <span class="pin-name">${city}</span>
-                <span class="pin-icon"></span>
-            `;
-            pinElement.onclick = () => navigateToCity(city);
-            pinElement.style.cursor = 'pointer';
-        }            
+        fetchCityFlag(city).then(flag => {
+            if (editMode) {
+                pinElement.innerHTML = `
+                    <span class="pin-name isediting" onclick="removePin(${index})">${city}<img src="${flag}" alt="Flag of ${city}" class="pin-flag"></span>
+                `;
+            
+            } else {
+                pinElement.innerHTML = `
+                    <span class="pin-name">${city}<img src="${flag}" alt="Flag of ${city}" class="pin-flag"></span>
+                `;
+                pinElement.onclick = () => navigateToCity(city);
+                pinElement.style.cursor = 'pointer';
+            }            
 
         pinList.appendChild(pinElement)
-    });
+    })
+});
 }
 
 async function navigateToCity(cityName) {
@@ -493,62 +565,6 @@ function getWindDirection(degree) {
 }
 
 let globalDailyForecast = [];
-
-async function getCountryFlag(country_code) {
-    const country_code_formatted = country_code.toLowerCase()
-    const flagUrl = `https://flagcdn.com/w40/${country_code_formatted}.png`;
-    const response2 = await fetch(flagUrl);
-    if (response2.ok) {
-        return flagUrl;
-    }
-}
-
-async function fetchExtendedWeatherData(city) {
-    try {
-        const geocodeResponse = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en`);
-        const geocodeData = await geocodeResponse.json();
-
-        if (!geocodeData.results || geocodeData.results.length === 0) {
-            throw new Error(`City '${city}' not found`);
-        }
-
-        const { latitude, longitude, name, country_code, country } = geocodeData.results[0];
-
-        const flag = await getCountryFlag(country_code)
-
-        const params = new URLSearchParams({
-            latitude: latitude,
-            longitude: longitude,
-            current_weather: 'true',
-            daily: [
-            'precipitation_sum',
-            'apparent_temperature_max', 
-            'apparent_temperature_min',
-            'precipitation_probability_max',
-            'weather_code',
-            'precipitation_hours'
-            ].join(','),
-            hourly: [
-            'temperature_2m',
-            'relative_humidity_2m', 
-            'precipitation',
-            'weather_code',
-            'wind_direction_80m',
-            'apparent_temperature',
-            'precipitation_probability',
-            ].join(','),
-            timezone: 'auto',
-            forecast_days: 7
-        });
-
-        const weatherResponse = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
-        const forecast = await weatherResponse.json();
-
-        return processWeatherData(forecast, name, flag, country);
-    } catch (error) {
-        throw new Error(`Failed to fetch weather data: ${error.message}`);
-    }
-}
 
 function processWeatherData(forecast, locationName, flag, country) {
     const currentWeather = forecast.current_weather;
