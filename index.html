@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Don't look up</title>
     <meta name="description" content="A clean weather site">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="static/css/styles.css">
 </head>
@@ -272,7 +272,7 @@
         <p id="app-heading-country" class="app-heading-country"></p>
 
         <div class="search-bar">
-            <input type="text" id="city-input" placeholder="Enter a city here...">
+            <input type="text" id="city-input" placeholder="Enter a city here..." autocomplete="off">
             <button id="search-button" type="submit">🔍</button>
         </div>
 
@@ -303,6 +303,10 @@
                 <p>No hourly forecast available</p>
             </div>
 
+            <h3>Weekly Forecast</h3>
+            <div class="daily-forecast" id="daily-forecast"></div>
+
+        
             <h3>Weather Details</h3>
             <div class="details">
                 <div class="detail-item">
@@ -312,16 +316,13 @@
                 <div class="detail-item">
                     <p>Risk of rain</p>
                     <p><span id="rain-risk"></span>% <br>
-                    <span id="precipitation-hours"></span> hrs.<br>
+                    <span id="precipitation-hours"></span> hrs.</p>
                 </div>
                 <div class="detail-item">
                     <p>Wind speed</p>
                     <p><span id="wind-speed"></span> km/h</p>
                 </div>
             </div>
-
-            <h3>Weekly Forecast</h3>
-            <div class="daily-forecast" id="daily-forecast"></div>
 
             <small style="font-style: italic; color: rgba(255,255,255,0.7);">Source: Open Meteo API</small>
         </div>

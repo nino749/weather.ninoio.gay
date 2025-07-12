@@ -230,23 +230,29 @@ function updatePinDisplay() {
     pinnedCities.forEach((city, index) => {
         const pinElement = document.createElement('div');
         pinElement.className = 'pin-item';
+        
+        if (editMode) {
+            pinElement.innerHTML = `
+                <span class="pin-name isediting" onclick="removePin(${index})">${city}<img src="" alt="Flag of ${city}" class="pin-flag" style="display:none;"></span>
+            `;
+        } else {
+            pinElement.innerHTML = `
+                <span class="pin-name">${city}<img src="" alt="Flag of ${city}" class="pin-flag" style="display:none;"></span>
+            `;
+            pinElement.onclick = () => navigateToCity(city);
+            pinElement.style.cursor = 'pointer';
+        }
+        
+        pinList.appendChild(pinElement);
+        
         fetchCityFlag(city).then(flag => {
-            if (editMode) {
-                pinElement.innerHTML = `
-                    <span class="pin-name isediting" onclick="removePin(${index})">${city}<img src="${flag}" alt="Flag of ${city}" class="pin-flag"></span>
-                `;
-            
-            } else {
-                pinElement.innerHTML = `
-                    <span class="pin-name">${city}<img src="${flag}" alt="Flag of ${city}" class="pin-flag"></span>
-                `;
-                pinElement.onclick = () => navigateToCity(city);
-                pinElement.style.cursor = 'pointer';
-            }            
-
-        pinList.appendChild(pinElement)
-    })
-});
+            const flagImg = pinElement.querySelector('.pin-flag');
+            if (flagImg && flag) {
+                flagImg.src = flag;
+                flagImg.style.display = 'inline';
+            }
+        });
+    });
 }
 
 async function navigateToCity(cityName) {
@@ -940,24 +946,34 @@ window.addEventListener("DOMContentLoaded", function() {
         closeButton.addEventListener('click', closeDailyModal);
     }
 
-    if (modal) {
-        modal.addEventListener('click', function(e) {
+    function addModalCloseListeners(modalElement, closeFn) {
+        if (!modalElement) return;
+        modalElement.addEventListener('click', function(e) {
             if (e.target === this) {
-                closeDailyModal();
+                closeFn();
             }
         });
+        modalElement.addEventListener('touchstart', function(e) {
+            if (e.target === this) {
+                closeFn();
+            }
+        });
+    }
+
+    if (modal) {
+        addModalCloseListeners(modal, closeDailyModal);
+    }
+    
+    if (closeButton) {
+        closeButton.addEventListener('click', closeDailyModal);
+    }
+
+    if (hourlyModal) {
+        addModalCloseListeners(hourlyModal, closeHourlyModal);
     }
     
     if (closeHourlyButton) {
         closeHourlyButton.addEventListener('click', closeHourlyModal);
-    }
-
-    if (hourlyModal) {
-        hourlyModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeHourlyModal();
-            }
-        });
     }
 
     document.addEventListener('keydown', function(e) {
