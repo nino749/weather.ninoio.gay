@@ -2334,18 +2334,18 @@ hr {
 
 .autocomplete-items {
     position: absolute;
-    top: 80px;
+    top: 45px;
     left: 0;
     right: 0;
     z-index: 1001;
-    background: rgba(219, 219, 219, 0.178);
+    background: rgba(219, 219, 219, 0.23);
     border-radius: 18px;
     box-shadow: 0 8px 24px var(--box-shadow-color);
     margin-top: 6px;
     padding: 6px 0;
     max-height: 260px;
     overflow-y: auto;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(50px);
     -webkit-backdrop-filter: blur(10px);
     color: var(--font-color);
     font-family: inherit;
