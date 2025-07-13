@@ -970,17 +970,6 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-
-
-
-
-
-
-
-
-
-
-
 @keyframes fadeInUp {
     0% {
     opacity: 0;
@@ -2345,7 +2334,7 @@ hr {
 
 .autocomplete-items {
     position: absolute;
-    top: 23dvh;
+    top: 80px;
     left: 0;
     right: 0;
     z-index: 1001;
