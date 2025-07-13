@@ -998,6 +998,7 @@ body {
     gap: 8px;
     animation: fadeIn 1.2s 0.2s backwards;
     background: transparent;
+    position: relative;
 }
 
 @keyframes fadeIn {
