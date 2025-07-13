@@ -424,11 +424,11 @@ function eventListeners() {
         editButton.addEventListener('click', toggleEditMode);
     }
 
-    const hourlyModalCloseButton = document.querySelector('#hourly-modal .close-button');
+    const hourlyModalCloseButton = document.getElementById('close-hourly-modal');
     if (hourlyModalCloseButton) {
         hourlyModalCloseButton.addEventListener('click', closeHourlyModal);
     }
-    const dailyModalCloseButton = document.querySelector('#daily-modal .close-button');
+    const dailyModalCloseButton = document.getElementById('close-daily-modal');
     if (dailyModalCloseButton) {
         dailyModalCloseButton.addEventListener('click', closeDailyModal);
     }
