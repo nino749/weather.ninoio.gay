@@ -2344,11 +2344,11 @@ hr {
 
 .autocomplete-items {
     position: absolute;
-    top: 16dvh;
+    top: 23dvh;
     left: 0;
     right: 0;
     z-index: 1001;
-    background: rgba(0, 0, 0, 0);
+    background: rgba(219, 219, 219, 0.178);
     border-radius: 18px;
     box-shadow: 0 8px 24px var(--box-shadow-color);
     margin-top: 6px;
