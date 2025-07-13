@@ -67,13 +67,17 @@ async function fetchExtendedWeatherData(city) {
         const weatherResponse = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
         const forecast = await weatherResponse.json();
 
+        const windyIframe = document.getElementById('windy-embed');
+        if (windyIframe && latitude && longitude) {
+            const windyUrl = `https://embed.windy.com/embed2.html?lat=${latitude}&lon=${longitude}&detailLat=${latitude}&detailLon=${longitude}&width=650&height=450&zoom=9&level=surface&overlay=rain&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1`;
+            windyIframe.src = windyUrl;
+        }
+
         return processWeatherData(forecast, name, flag, country);
     } catch (error) {
         throw new Error(`Failed to fetch weather data: ${error.message}`);
     }
 }
-
-//
 
 function clearAllPins() {
     pinnedCities = [];
@@ -424,16 +428,24 @@ const waterContainer = document.getElementById('water-container');
 function createRaindrops() {
     const rainEffect = document.getElementById('rain-effect');
     if (!rainEffect) return;
-    
-    rainEffect.innerHTML = '';
 
-    for (let i = 0; i < 150; i++) {
-        const drop = document.createElement('div');
-        drop.className = 'raindrop';
-        drop.style.left = Math.random() * 100 + '%';
+    const dropCount = 100;
+    if (rainEffect.childElementCount !== dropCount) {
+        rainEffect.innerHTML = '';
+        const fragment = document.createDocumentFragment();
+        for (let i = 0; i < dropCount; i++) {
+            const drop = document.createElement('div');
+            drop.className = 'raindrop';
+            fragment.appendChild(drop);
+        }
+        rainEffect.appendChild(fragment);
+    }
+
+    for (let i = 0; i < dropCount; i++) {
+        const drop = rainEffect.children[i];
+        drop.style.left = (Math.random() * 100) + '%';
         drop.style.animationDuration = (Math.random() * 0.5 + 0.5) + 's';
-        drop.style.animationDelay = Math.random() * 2 + 's';
-        rainEffect.appendChild(drop);
+        drop.style.animationDelay = (Math.random() * 2) + 's';
     }
 }
 
@@ -451,16 +463,6 @@ function createScreenDrops() {
         drop.style.animationDelay = Math.random() * 3 + 's';
         screenDrops.appendChild(drop);
     }
-}
-
-function triggerLightning() {
-    const lightning = document.getElementById('lightning');
-    if (!lightning) return;
-    
-    lightning.classList.add('flash');
-    setTimeout(() => {
-        lightning.classList.remove('flash');
-    }, 300);
 }
 
 function activateWaterWaves() {
@@ -490,12 +492,6 @@ function activateRainScene() {
 
     createRaindrops();
     createScreenDrops();
-
-    lightningTimer = setInterval(() => {
-        if (Math.random() < 0.3) {
-            triggerLightning();
-        }
-    }, 3000);
 }
 
 function activateSunnyScene() {
@@ -983,3 +979,36 @@ window.addEventListener("DOMContentLoaded", function() {
         }
     })
 });
+
+function setDefaultBackground() {
+    const defaultBg = document.getElementById('thunderstorm-background');
+    if (!defaultBg) return;
+
+    if (defaultBg.classList.contains('active')) {
+        const weatherDisplay = document.getElementById('weather-display');
+        if (weatherDisplay && weatherDisplay.classList.contains('show')) {
+            let weatherCode = null;
+
+            if (window.globalDailyForecast && window.globalDailyForecast.length > 0) {
+                weatherCode = window.globalDailyForecast[0].weather_code;
+            }
+            const weatherDescEl = document.getElementById('weather-desc');
+            if (weatherDescEl) {
+                const desc = weatherDescEl.textContent;
+                for (const [code, info] of Object.entries(weatherCodes)) {
+                    if (info.desc === desc) {
+                        weatherCode = parseInt(code, 10);
+                        break;
+                    }
+                }
+            }
+            const bg = weatherCodes[weatherCode]?.bg || 'sunny-background';
+            activateScene(bg);
+        } else {
+            activateScene('sunny-background');
+        }
+    } else {
+        deactivateAllScenes();
+        defaultBg.classList.add('active');
+    }
+}
