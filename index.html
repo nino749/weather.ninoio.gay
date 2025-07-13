@@ -13,7 +13,7 @@
     <div class="dropdown-container">
         <button class="menu-button" onclick="toggleDropdown()">☰</button>
         <div class="dropdown-menu" id="dropdown-menu">
-            <a href="#" onclick="setDefaultBackground(); return false;">🎨 Static style</a>
+            <a href="#" onclick="toggleDefaultBackground(); return false;">🎨 Static style</a>
             <a href="https://ninoio.xyz/" target="_blank" rel="noopener">🏠 Homepage</a>
             <a href="https://github.com/ninocss">🐈‍⬛ Github</a>
             <a href="/templates/privacy.html">🕵️ Privacy</a>
@@ -297,9 +297,8 @@
     <div class="screen-drops" id="screen-drops"></div>
 
     <!-- Main Weather App -->
+    <div id="error-container"></div>
     <form class="weather-app" id="weather-app">
-        <div id="error-container"></div>
-
         <h1 class="app-heading" id="app-heading">Don't look up</h1>
         <p id="app-heading-country" class="app-heading-country"></p>
 
