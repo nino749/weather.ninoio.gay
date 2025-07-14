@@ -36,20 +36,9 @@ body {
     height: 100%;
     z-index: -1;
     transition: opacity 0.8s ease-in-out;
-    background: linear-gradient(135deg, 
-        #FF0000 0%,
-        #FF7F00 14%,
-        #FFFF00 28%,
-        #00FF00 42%,
-        #00FFFF 50%,
-        #0000FF 57%,
-        #4B0082 71%,
-        #8B00FF 85%,
-        #FF00FF 92%,
-        #FF0000 100%
-    );
-    filter: blur(0.5px) brightness(0.7) saturate(0.5);
-    background-size: 400% 400%;
+    background: radial-gradient(ellipse at 60% 40%, #6dd5ed 0%, #2193b0 30%, #b2fefa 60%, #f7797d 100%);
+    filter: blur(0.5px) brightness(0.5) saturate(1.2);
+    background-size: 300% 300%;
     animation: gradientShift 20s ease infinite;
 }
 
